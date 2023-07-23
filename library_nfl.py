@@ -53,6 +53,9 @@ def pull_data_stats(urls):
 
         dataframes[position] = table_df
 
+        # Drop column
+        table_df.drop(columns='rost', inplace=True)
+
     # Return dictionary 
     return dataframes
 
