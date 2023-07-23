@@ -57,41 +57,7 @@ def pull_data_stats(urls):
     return dataframes
 
 # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-def pull_data_snapcount(urls):
-    # Dictionary to store all tables
-    dataframes = {}
 
-    # Loop through each url and import data
-    for url in urls: 
-        # The read_html function returns a list of all the tables found on the web page
-        tables = pd.read_html(url)
-
-        # Assuming the table you want is the first one in the list, you can access it like this
-        table_df = tables[0]
-
-        # Get position from URL
-        position = url.split('/')[6].split('.')[0].upper()
-
-        # Remove %%!
-        table_df = table_df.replace('\%', '', regex=True)
-
-        table_df.columns = [x.lower() for x in table_df.columns]
-
-        table_df['pos'] = position
-
-        # Keep only relevant columns
-        table_df = table_df[['player', 'team', 'pos', 'avg']]
-
-        # Convert avg to numeric
-        table_df.rename(columns={'avg': 'avg_snap_pct'}, inplace=True)
-
-        table_df['avg_snap_pct'] = table_df['avg_snap_pct'].astype(int)
-
-
-        dataframes[position] = table_df
-
-    # Return dictionary 
-    return dataframes
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
