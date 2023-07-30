@@ -155,4 +155,76 @@ def pull_data_target_distribution(urls, nfl_teams_dict):
     # Return dictionary 
     return table_df
 
+# ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+def get_percentiles(df, col):
+    percentiles = []
+    for i in range(10, 100, 5):
+        percentiles.append(np.percentile(df[col], i))
+
+    return percentiles
+
+
+# ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+# Function to assign score
+def score_column(x, df, col):
+    # Find percentiles
+    percentiles = get_percentiles(df, col)
+    # Assign grade to each player
+    score = 1
+    for p in percentiles:
+        if x[col] < p:
+            return score
+        score = score + 0.5
+        
+    return 10
+
+# ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+def merge_score(df1, df2, col):
+    # Create provisional score column
+    df1['score'] = df1.apply(lambda x: score_column(x, df1, col), axis=1)
+    # Merge with new score df
+    df2 = df2.merge(df1[['player', 'score']], how='left', on='player').rename(columns={'score': f'score_{col}'})
+
+    # Check result
+    return df2
+
+
 # ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+def create_radar_diagram(df, player, team):
+    # Filter the DataFrame for the specific player and team
+    player_data = df[(df['player'] == player) & (df['team'] == team)]
+
+    # List of column names
+    columns = df.columns.drop(['player', 'team'])
+
+    # Get the scores for the player and team
+    scores = player_data[columns].values[0]
+
+    # Number of variables
+    num_variables = len(columns)
+
+    # Calculate the angle for each variable
+    angles = np.linspace(0, 2 * np.pi, num_variables, endpoint=False)
+
+    # Make the plot circular
+    angles = np.concatenate((angles, [angles[0]]))
+    scores = np.concatenate((scores, [scores[0]]))
+
+    # Create the radar chart
+    fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(polar=True))
+    ax.plot(angles, scores, linewidth=2, linestyle='solid', c='lightseagreen')
+    ax.fill(angles, scores, alpha=0.1, c='lightseagreen')
+
+    # Set the labels for each variable
+    ax.set_xticks(angles[:-1])
+    ax.set_xticklabels([x.replace('score_', '') for x in  columns])
+
+    # Set the title
+    ax.set_title(f"Radar Diagram for {player} ({team})")
+
+    # Display the plot
+    plt.show()
