@@ -18,7 +18,7 @@ warnings.filterwarnings('ignore')
 pd.set_option('display.max_columns', 500) 
 
 # Graphing style
-plt.style.use('seaborn-colorblind')
+#plt.style.use('seaborn-colorblind')
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -49,7 +49,7 @@ def pull_data_stats(urls):
         table_df['team'] = table_df['player'].apply(lambda x: x.split('(')[1].replace(')', '') if '(' in x else None)
 
         # Remove team from name
-        table_df['player'] = table_df['player'].replace('\s\(.+\)', '', regex=True)
+        table_df['player'] = table_df['player'].replace(r'\s\(.+\)', '', regex=True)
 
         dataframes[position] = table_df
 
@@ -76,7 +76,7 @@ def pull_data_snapcount(urls):
         position = url.split('/')[6].split('.')[0].upper()
 
         # Remove %%!
-        table_df = table_df.replace('\%', '', regex=True)
+        table_df = table_df.replace(r'\%', '', regex=True)
         # Remove byes!
         table_df = table_df.replace('bye', '200', regex=True)
 
